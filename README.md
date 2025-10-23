@@ -78,7 +78,7 @@ system, powered with AI.
   - Optymalizacja wydajności
   - Dodanie nowych funkcji (np. komentarze, rekomendacje)
 # Harmonogram Pracy
-- Praca zostałą podzielona pomiędzy dwa zespoły: backend i frontend
+- Praca została podzielona pomiędzy dwa zespoły: backend i frontend
     ## Iteracja 1
     - **backend**
         - Inicjalizacja projeku Go/Gin (moduły, konfiguracja)
