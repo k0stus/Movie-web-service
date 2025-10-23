@@ -102,7 +102,7 @@ system, powered with AI.
         - Watchlist
         - Rating
         - Caching
-    - *frontend**
+    - **frontend**
         - Widok playlist
         - Gwiazdkowane oceny
         - Podobne tytuły na głównej stronie
