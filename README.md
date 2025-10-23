@@ -98,13 +98,13 @@ system, powered with AI.
         - katalog (paginacja, sortowanie) 
         - wideo player
     ## Iteracja 3
-    -**backend**
-        -Watchlist
-        -Rating
-        -Caching
-    -**frontend**
-        -Widok playlist
-        -Gwiazdkowane oceny
-        -Podobne tytuły na głównej stronie
+    - **backend**
+        - Watchlist
+        - Rating
+        - Caching
+    - *frontend**
+        - Widok playlist
+        - Gwiazdkowane oceny
+        - Podobne tytuły na głównej stronie
 
         
