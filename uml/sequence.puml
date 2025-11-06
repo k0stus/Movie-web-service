@@ -1,0 +1,68 @@
+@startuml
+actor User
+participant "Frontend (React)" as FE
+participant "Backend API (Go/Gin)" as BE
+participant "Cache (Redis)" as Cache
+database "Database (MongoDB / PostgreSQL)" as DB
+
+== 🔐 Login ==
+User -> FE : Enter email + password
+FE -> BE : POST /api/login
+BE -> DB : SELECT user by email
+DB --> BE : user record
+BE -> BE : verify password, generate JWT
+BE --> FE : Set-Cookie (JWT, httpOnly)
+FE --> User : "Welcome back!"
+
+== 🎞️ Browse and View Movie ==
+User -> FE : Open Movie List
+FE -> Cache : GET movies cache
+Cache --> FE : cache miss
+FE -> BE : GET /api/movies
+BE -> DB : Query movies
+DB --> BE : List of movies
+BE -> Cache : Store movies in cache
+BE --> FE : JSON response (movie list)
+FE --> User : Render movie cards
+
+User -> FE : Click on movie
+FE -> BE : GET /api/movie/:id
+BE -> DB : SELECT movie by id
+DB --> BE : movie details
+BE --> FE : movie JSON
+FE --> User : Show movie details page
+
+== ⭐ Rate and Comment ==
+User -> FE : Submit rating/comment
+FE -> BE : POST /api/movie/:id/review {rating, comment}
+BE -> DB : INSERT Review + Comment
+DB --> BE : OK
+BE --> FE : 201 Created
+FE --> User : Update UI with new review
+
+== 🕒 Add to Watch Later ==
+User -> FE : Click "Add to Watch Later"
+FE -> BE : POST /api/watchlater {movieId}
+BE -> DB : UPDATE user.watchLater append(movieId)
+DB --> BE : OK
+BE --> FE : 200 OK
+FE --> User : "Added to Watch Later"
+
+== 🧠 Get Recommendations ==
+User -> FE : Open "Recommended for You"
+FE -> BE : GET /api/recommendations
+BE -> DB : SELECT recent movies + user ratings
+DB --> BE : user profile data
+BE -> DB : SELECT movies WHERE id IN (...)
+DB --> BE : Movie metadata
+BE --> FE : JSON {recommendedMovies}
+FE --> User : Show recommended list
+
+== 📊 View Statistics ==
+User -> FE : Open Profile
+FE -> BE : GET /api/statistics
+BE -> DB : SELECT stats WHERE userId = X
+DB --> BE : user statistics
+BE --> FE : JSON {moviesWatched, avgRating, commentsCount}
+FE --> User : Render statistics dashboard
+@enduml

@@ -1,0 +1,30 @@
+@startuml
+node "Frontend (React)" as FE {
+    component "Home Page" as Home
+    component "Movie Detail" as MovieDetail
+    component "Auth UI" as AuthUI
+    component "Watch Later" as WL
+    component "Statistics" as Stats
+}
+
+node "Backend (Go + Gin)" as BE {
+    component "User Controller" as UC
+    component "Movie Controller" as MC
+    component "Recommendation Service" as RS
+    component "Statistics Service" as SS
+    component "Cache Layer (Redis)" as Cache
+}
+
+database "MongoDB" as DB
+node "External APIs" as EXT {
+    component "TMDB API" as TMDB
+    component "OpenAI API" as OAI
+}
+
+FE --> BE : REST API (JSON)
+BE --> DB : CRUD / Query
+BE --> Cache : Cached queries
+RS --> OAI : Recommendation generation
+MC --> TMDB : Metadata import
+BE --> FE : JWT Auth + Data responses
+@enduml
