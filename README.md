@@ -83,28 +83,31 @@ system, powered with AI.
     - **backend**
         - Inicjalizacja projeku Go/Gin (moduły, konfiguracja)
         - Zainicjalizowanie bazy danych w MongoDB
+        - Autentykacja (np. JWT )
+        - Endpoints (operacje CRUD, query itd)
     - **frontend**
         - Projekt struktury aplikacji (router, layout)
         - Podstawowe UI (Button, Card, Navbar)
         - Integracja klienta HTTP, obsługa błędów
-    ## Iteracja 2
-    - **backend**
-        - Autentykacja (np. JWT )
-        - Endpoints (operacje CRUD, query itd)
-        - Serwowanie wideo (filmy z Cloud)
-    - **frontend**
         - Ekrany (Login, sign up)
         - wygaszanie sesji
-        - katalog (paginacja, sortowanie) 
-        - wideo player
-    ## Iteracja 3
+    ## Iteracja 2
     - **backend**
+        - Serwowanie wideo (filmy z Cloud)
         - Watchlist
         - Rating
         - Caching
     - **frontend**
+        - katalog (paginacja, sortowanie) 
+        - wideo player
         - Widok playlist
         - Gwiazdkowane oceny
         - Podobne tytuły na głównej stronie
 
-        
+# Ryzyka projektowe:
+| Ryzyko                                          | Prawdop. | Wpływ  | Typ           | Opis                                                 |
+| ----------------------------------------------- | -------- | ------ | ------------- | ---------------------------------------------------- |
+| Opóźnienia w integracji backend–frontend        | Średnie  | Wysoki | Techniczne    | Problemy z kompatybilnością API lub różne tempo prac |
+| Brak danych filmowych / API limit               | Niskie   | Średni | Zasobowe      | API TMDB/OMDb z limitem requestów lub awarią         |
+| Problemy z wydajnością (cache, zapytania DB)    | Średnie  | Średni | Techniczne    | Długie czasy odpowiedzi przy wielu użytkownikach     |
+| Brak spójnego designu UI                             | Średnie  | Średni | UX            | Niespójny wygląd lub UX na mobile                    |
