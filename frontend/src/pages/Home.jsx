@@ -1,33 +1,27 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 function Home() {
   const navigate = useNavigate();
 
   return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
-      <h1>Witamy w Movie Web App</h1>
-      <p>To jest strona główna. Miłego przeglądania filmów!</p>
-      <div style={{ marginTop: "20px" }}>
-        <button
-          onClick={() => alert("Funkcja wkrótce dostępna!")}
-          style={{ marginRight: "10px" }}
-        >
-          Przeglądaj filmy
-        </button>
+    <>
+      <Navbar />
+      <div style={{ textAlign: "center", marginTop: "120px" }}>
+        <h1>Witamy w Movie Web App</h1>
+        <p>To jest strona główna. Miłego przeglądania filmów!</p>
 
-        <button
-          onClick={() => navigate("/login")}
-          style={{ marginRight: "10px" }}
-        >
-          Zaloguj się
-        </button>
-
-        <button onClick={() => navigate("/register")}>
-          Zarejestruj się
-        </button>
+        <div style={{ marginTop: "20px" }}>
+          <button
+            onClick={() => alert("Ta funkcja już wkrótce!")}
+            style={{ marginRight: "10px" }}
+          >
+            Przeglądaj filmy
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
