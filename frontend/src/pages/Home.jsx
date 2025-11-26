@@ -14,7 +14,7 @@ function Home() {
 
         <div style={{ marginTop: "20px" }}>
           <button
-            onClick={() => alert("Ta funkcja już wkrótce!")}
+            onClick={() => navigate("/movies")}
             style={{ marginRight: "10px" }}
           >
             Przeglądaj filmy

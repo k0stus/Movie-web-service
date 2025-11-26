@@ -1,0 +1,37 @@
+.movies-container {
+  text-align: center;
+  padding: 40px;
+}
+
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 25px;
+  margin-top: 40px;
+  padding: 0 20px;
+}
+
+.movie-card {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.movie-card:hover {
+  transform: scale(1.05);
+}
+
+.movie-poster {
+  width: 100%;          /* dopasowanie do szerokości karty */
+  height: 300px;        /* wysokość zgodna z proporcją 2:3 */
+  object-fit: cover;    /* przytnie obrazek do wymiarów, zachowując proporcje */
+  border-radius: 10px;
+}
+
+.movie-title {
+  margin-top: 10px;
+  font-size: 1rem;
+}
