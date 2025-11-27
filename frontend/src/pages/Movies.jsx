@@ -38,11 +38,12 @@ export default function Movies() {
 
         <div className="movies-grid">
           {movies.map((movie) => (
-            <MovieCard
-              key={movie.id}
-              title={movie.title}
-              poster={movie.poster}
-            />
+        <MovieCard
+          key={movie.id}
+          id={movie.id}
+          title={movie.title}
+          poster={movie.poster}
+        />
           ))}
         </div>
                 <button

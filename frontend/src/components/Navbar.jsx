@@ -8,8 +8,7 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-      
-      {/* Desktop buttons */}
+    
       <div className="desktop-buttons">
         <button className="nav-btn" onClick={() => navigate("/login")}>
           Logowanie
@@ -19,8 +18,6 @@ export default function Navbar() {
           Rejestracja
         </button>
       </div>
-
-      {/* Hamburger */}
       <div
         className="hamburger-button"
         onClick={() => setMenuOpen(!menuOpen)}
@@ -28,7 +25,6 @@ export default function Navbar() {
         ☰
       </div>
 
-      {/* Mobile menu */}
       {menuOpen && (
         <div className="mobile-menu">
           <button className="mobile-btn" onClick={() => navigate("/login")}>
