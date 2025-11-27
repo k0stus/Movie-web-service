@@ -1,54 +1,45 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../styles/navbar.css";
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <nav style={styles.nav}>
-      <div style={styles.buttons}>
-        <button style={styles.button} onClick={() => navigate("/login")}>
+    <nav className="navbar">
+      
+      {/* Desktop buttons */}
+      <div className="desktop-buttons">
+        <button className="nav-btn" onClick={() => navigate("/login")}>
           Logowanie
         </button>
 
-        <button style={styles.button} onClick={() => navigate("/register")}>
+        <button className="nav-btn" onClick={() => navigate("/register")}>
           Rejestracja
         </button>
       </div>
+
+      {/* Hamburger */}
+      <div
+        className="hamburger-button"
+        onClick={() => setMenuOpen(!menuOpen)}
+      >
+        ☰
+      </div>
+
+      {/* Mobile menu */}
+      {menuOpen && (
+        <div className="mobile-menu">
+          <button className="mobile-btn" onClick={() => navigate("/login")}>
+            Logowanie
+          </button>
+
+          <button className="mobile-btn" onClick={() => navigate("/register")}>
+            Rejestracja
+          </button>
+        </div>
+      )}
     </nav>
   );
 }
-const styles = {
-  nav: {
-    width: "100%",
-    backgroundColor: "#ffffff",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-    padding: "15px 40px",  
-    boxSizing: "border-box", 
-    height: "70px",
-    position: "fixed",
-    top: 0,
-    left: 0,
-
-    display: "flex",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    zIndex: 1000,
-  },
-
-  buttons: {
-    display: "flex",
-    gap: "20px", 
-  },
-
-  button: {
-    backgroundColor: "#3498db",
-    color: "white",
-    padding: "10px 20px",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
-    fontSize: "15px",
-    whiteSpace: "nowrap",
-  },
-};

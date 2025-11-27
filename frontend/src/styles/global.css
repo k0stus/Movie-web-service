@@ -1,4 +1,4 @@
-/* Globalne ustawienia */
+
 body {
   font-family: Arial, sans-serif;
   background-color: #f5f5f5;
@@ -6,7 +6,6 @@ body {
   padding: 0;
 }
 
-/* Strona Home, Login, Register */
 .home-page,
 .login-page,
 .register-page {
@@ -18,7 +17,6 @@ body {
   padding-top: 100px;
 }
 
-/* Formularze */
 .login-form,
 .register-form {
   background-color: #ffffff;
@@ -35,7 +33,6 @@ body {
   color: #333333;
 }
 
-/* Inputy */
 input[type="email"],
 input[type="password"] {
   width: 100%;
@@ -47,7 +44,6 @@ input[type="password"] {
   font-size: 14px;
 }
 
-/* Błąd walidacji */
 .error-message {
   color: #e74c3c;
   font-size: 12px;
@@ -55,7 +51,6 @@ input[type="password"] {
   text-align: left;
 }
 
-/* Przyciski */
 button {
   background-color: #3498db;
   color: white;
@@ -71,12 +66,10 @@ button:hover {
   background-color: #2980b9;
 }
 
-/* Odstępy między przyciskami */
 button + button {
   margin-left: 10px;
 }
 
-/* Dodatkowy margines dla przycisku powrotu */
 .login-page button,
 .register-page button {
   margin-top: 10px;
