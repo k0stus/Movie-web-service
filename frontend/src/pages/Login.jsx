@@ -1,74 +1,92 @@
+// src/pages/Login.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "../api";
+import { useAuth } from "../AuthContext";
 
 export default function Login() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [emailError, setEmailError] = useState("");
-    const [passwordError, setPasswordError] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-    const navigate = useNavigate(); 
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [formError, setFormError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-    const validateEmail = (value) => {
-        if (!value) return "Email jest wymagany";
-        const regex = /\S+@\S+\.\S+/;
-        if (!regex.test(value)) return "Nieprawidłowy format email";
-        return "";
-    };
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
-    const validatePassword = (value) => {
-        if (!value) return "Hasło jest wymagane";
-        if (value.length < 6) return "Hasło musi mieć minimum 6 znaków";
-        return "";
-    };
+  const validateEmail = (value) => {
+    if (!value) return "Email jest wymagany";
+    const regex = /\S+@\S+\.\S+/;
+    if (!regex.test(value)) return "Nieprawidłowy format email";
+    return "";
+  };
 
-    const handleEmailChange = (e) => {
-        setEmail(e.target.value);
-    };
+  const validatePassword = (value) => {
+    if (!value) return "Hasło jest wymagane";
+    if (value.length < 6) return "Hasło musi mieć minimum 6 znaków";
+    return "";
+  };
 
-    const handlePasswordChange = (e) => {
-        setPassword(e.target.value);
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const emailErr = validateEmail(email);
-        const passErr = validatePassword(password);
-        setEmailError(emailErr);
-        setPasswordError(passErr);
+    const emailErr = validateEmail(email);
+    const passErr = validatePassword(password);
 
-        if (!emailErr && !passErr) {
-            console.log("fetch do backendu");
-            // TODO: dodac integracje z backendem
-        }
-    };
+    setEmailError(emailErr);
+    setPasswordError(passErr);
+    setFormError("");
 
-    return (
-        <div className="login-page">
-            <form className="login-form" onSubmit={handleSubmit}>
-                <h2>Logowanie</h2>
+    if (emailErr || passErr) return;
 
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={handleEmailChange}
-                />
-                {emailError && <p className="error-message">{emailError}</p>}
+    try {
+      setLoading(true);
+      const token = await loginUser(email, password);
+      // zapis do AuthContext + localStorage
+      login(email, token);
+      navigate("/movies");
+    } catch (err) {
+      console.error("Login error:", err);
+      setFormError(err.message || "Logowanie nie powiodło się");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-                <input
-                    type="password"
-                    placeholder="Hasło"
-                    value={password}
-                    onChange={handlePasswordChange}
-                />
-                {passwordError && <p className="error-message">{passwordError}</p>}
+  return (
+    <div className="login-page">
+      <form className="login-form" onSubmit={handleSubmit}>
+        <h2>Logowanie</h2>
 
-                <button type="submit">Zaloguj się</button>
-            </form>
-            <div style={{ textAlign: "center", marginTop: "20px" }}>
-                <button onClick={() => navigate("/")}>Powrót do strony głównej</button>
-            </div>
-        </div>
-    );
+        {formError && <p className="error-message">{formError}</p>}
+
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        {emailError && <p className="error-message">{emailError}</p>}
+
+        <input
+          type="password"
+          placeholder="Hasło"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        {passwordError && <p className="error-message">{passwordError}</p>}
+
+        <button type="submit" disabled={loading}>
+          {loading ? "Logowanie..." : "Zaloguj się"}
+        </button>
+      </form>
+
+      <div style={{ textAlign: "center", marginTop: "20px" }}>
+        <button onClick={() => navigate("/")}>Powrót do strony głównej</button>
+      </div>
+    </div>
+  );
 }
+

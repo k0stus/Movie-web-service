@@ -3,27 +3,44 @@ import { useNavigate } from "react-router-dom";
 import MovieCard from "../components/MovieCard";
 import Navbar from "../components/Navbar";
 import "../styles/movieCard.css";
+import { getPopularMovies } from "../api";
 
 export default function Movies() {
   const [movies, setMovies] = useState([]);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    // TODO: fetch movies from API
+    async function loadMovies() {
+      try {
+        const data = await getPopularMovies();
+	      console.log("POPULAR:",data);
+	      const mapped = data.map((m) => {
+  const raw = m.posterPath || m.poster_path;
 
-    // mock for testing frontendu, delete after adding fetch
-    setMovies([
-  { id: 1, title: "Movie 1", poster: "https://placecats.com/300/200" },
-  { id: 2, title: "movie 2", poster: "https://placecats.com/300/200" },
-  { id: 3, title: "Movie 3", poster: "https://placecats.com/300/200" },
-  { id: 4, title: "Movie 4", poster: "https://placecats.com/300/200" },
-  { id: 5, title: "Movie 5", poster: "https://placecats.com/300/200" },
-  { id: 6, title: "Movie 6", poster: "https://placecats.com/300/200" },
-  { id: 7, title: "Movie 7", poster: "https://placecats.com/300/200" },
-  { id: 8, title: "Movie 8", poster: "https://placecats.com/300/200" },
-  { id: 9, title: "Movie 9", poster: "https://placecats.com/300/200" }
-]);
+  let poster;
+  if (!raw) {
+    poster = "https://via.placeholder.com/300x450?text=Brak+Obrazka";
+  } else if (raw.startsWith("http")) {
+    poster = raw;
+  } else {
+    poster = `https://image.tmdb.org/t/p/w300${raw}`;
+  }
 
+  return {
+    id: m.id,
+    title: m.title,
+    poster,
+  };
+});
+
+        setMovies(mapped);
+      } catch (err) {
+        setError(err.message);
+      }
+    }
+
+    loadMovies();
   }, []);
 
   return (
@@ -31,25 +48,31 @@ export default function Movies() {
       <Navbar />
 
       <div className="movies-container" style={{ paddingTop: "100px" }}>
-
         <h1 style={{ textAlign: "center", marginBottom: "20px" }}>
           Dostępne Filmy
         </h1>
 
+        {error && (
+          <p style={{ color: "red", textAlign: "center" }}>{error}</p>
+        )}
+
         <div className="movies-grid">
           {movies.map((movie) => (
-            <MovieCard
+            <div
               key={movie.id}
-              title={movie.title}
-              poster={movie.poster}
-            />
+              onClick={() => navigate(`/movies/${movie.id}`)}
+              style={{ cursor: "pointer" }}
+            >
+              <MovieCard title={movie.title} poster={movie.poster} />
+            </div>
           ))}
         </div>
-                <button
+
+        <button
           style={{
             marginTop: "20px",
             marginLeft: "20px",
-            marginBottom: "20px"
+            marginBottom: "20px",
           }}
           onClick={() => navigate("/")}
         >
@@ -59,3 +82,4 @@ export default function Movies() {
     </>
   );
 }
+

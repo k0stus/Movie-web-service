@@ -25,9 +25,9 @@
 }
 
 .movie-poster {
-  width: 100%;          /* dopasowanie do szerokości karty */
-  height: 300px;        /* wysokość zgodna z proporcją 2:3 */
-  object-fit: cover;    /* przytnie obrazek do wymiarów, zachowując proporcje */
+  width: 100%;         
+  height: 300px;        
+  object-fit: cover;    
   border-radius: 10px;
 }
 

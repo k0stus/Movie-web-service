@@ -1,54 +1,107 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../styles/navbar.css";
+import { useAuth } from "../AuthContext";
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   return (
-    <nav style={styles.nav}>
-      <div style={styles.buttons}>
-        <button style={styles.button} onClick={() => navigate("/login")}>
-          Logowanie
-        </button>
+    <nav className="navbar">
 
-        <button style={styles.button} onClick={() => navigate("/register")}>
-          Rejestracja
-        </button>
+     
+      <div className="navbar-logo" onClick={() => navigate("/")}>
+        Movie Web App
       </div>
+
+      
+      <div className="desktop-buttons">
+
+        {!user && (
+          <>
+            <button className="nav-btn" onClick={() => navigate("/login")}>
+              Logowanie
+            </button>
+
+            <button className="nav-btn" onClick={() => navigate("/register")}>
+              Rejestracja
+            </button>
+          </>
+        )}
+
+        {user && (
+          <>
+            <span className="nav-email">{user.email}</span>
+
+            <button
+              className="nav-btn logout-btn"
+              onClick={() => {
+                logout();
+                navigate("/");
+              }}
+            >
+              Wyloguj
+            </button>
+          </>
+        )}
+      </div>
+
+      <div
+        className="hamburger-button"
+        onClick={() => setMenuOpen(!menuOpen)}
+      >
+        ☰
+      </div>
+
+      {/* MOBILE MENU */}
+      {menuOpen && (
+        <div className="mobile-menu">
+
+          {!user && (
+            <>
+              <button
+                className="mobile-btn"
+                onClick={() => {
+                  navigate("/login");
+                  setMenuOpen(false);
+                }}
+              >
+                Logowanie
+              </button>
+
+              <button
+                className="mobile-btn"
+                onClick={() => {
+                  navigate("/register");
+                  setMenuOpen(false);
+                }}
+              >
+                Rejestracja
+              </button>
+            </>
+          )}
+
+          {user && (
+            <>
+              <span className="mobile-email">{user.email}</span>
+
+              <button
+                className="mobile-btn logout-btn"
+                onClick={() => {
+                  logout();
+                  setMenuOpen(false);
+                  navigate("/");
+                }}
+              >
+                Wyloguj
+              </button>
+            </>
+          )}
+        </div>
+      )}
     </nav>
   );
 }
-const styles = {
-  nav: {
-    width: "100%",
-    backgroundColor: "#ffffff",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-    padding: "15px 40px",  
-    boxSizing: "border-box", 
-    height: "70px",
-    position: "fixed",
-    top: 0,
-    left: 0,
 
-    display: "flex",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    zIndex: 1000,
-  },
-
-  buttons: {
-    display: "flex",
-    gap: "20px", 
-  },
-
-  button: {
-    backgroundColor: "#3498db",
-    color: "white",
-    padding: "10px 20px",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
-    fontSize: "15px",
-    whiteSpace: "nowrap",
-  },
-};

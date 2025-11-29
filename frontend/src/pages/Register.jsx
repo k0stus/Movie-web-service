@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { registerUser } from "../api";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -9,6 +10,7 @@ export default function Register() {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmError, setConfirmError] = useState("");
+  const [formError, setFormError] = useState("");
 
   const navigate = useNavigate();
 
@@ -31,8 +33,10 @@ export default function Register() {
     return "";
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setFormError("");
 
     const emailErr = validateEmail(email);
     const passErr = validatePassword(password);
@@ -42,9 +46,14 @@ export default function Register() {
     setPasswordError(passErr);
     setConfirmError(confirmErr);
 
-    if (!emailErr && !passErr && !confirmErr) {
-      console.log("fetch do backendu - rejestracja");
-      // TODO: dodac integracje z backendem
+    if (emailErr || passErr || confirmErr) return;
+
+    try {
+      await registerUser(email, "", password);
+      navigate("/login");
+    } catch (err) {
+      setFormError(err.message);
+      console.error("Register error:", err);
     }
   };
 
@@ -52,6 +61,8 @@ export default function Register() {
     <div className="register-page">
       <form className="register-form" onSubmit={handleSubmit}>
         <h2>Rejestracja</h2>
+
+        {formError && <p className="error-message">{formError}</p>}
 
         <input
           type="email"
@@ -81,8 +92,11 @@ export default function Register() {
       </form>
 
       <div style={{ textAlign: "center", marginTop: "20px" }}>
-        <button onClick={() => navigate("/")}>Powrót do strony głównej</button>
+        <button onClick={() => navigate("/")}>
+          Powrót do strony głównej
+        </button>
       </div>
     </div>
   );
 }
+
