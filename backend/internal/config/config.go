@@ -33,4 +33,3 @@ func Load() *Config {
 	log.Println("Config loaded")
 	return cfg
 }
-

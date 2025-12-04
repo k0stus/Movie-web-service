@@ -10,4 +10,3 @@ type Review struct {
 	Comment   string    `bson:"comment" json:"comment"`
 	CreatedAt time.Time `bson:"createdAt" json:"createdAt"`
 }
-

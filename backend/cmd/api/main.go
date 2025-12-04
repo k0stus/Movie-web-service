@@ -7,18 +7,17 @@ import (
 	"movie-backend/internal/db"
 	"movie-backend/internal/list"
 	"movie-backend/internal/movie"
+	"movie-backend/internal/review"
 	"movie-backend/internal/router"
 	"movie-backend/internal/tmdb"
 	"movie-backend/internal/user"
-
 )
 
 func main() {
 	cfg := config.Load()
-
 	client, err := db.NewMongoClient(cfg.MongoURI)
 	if err != nil {
-		log.Fatal("cannot connect to Mongo:", err)
+		log.Fatal("cannot connect to Mongo: ", err)
 	}
 	database := client.Database(cfg.MongoDB)
 
@@ -27,12 +26,14 @@ func main() {
 	userHandler := user.NewHandler(database, cfg.JWTSecret)
 	movieHandler := movie.NewHandler(tmdbClient)
 	listHandler := list.NewHandler(database)
+	reviewHandler := review.NewHandler(database)
 
 	r := router.New(router.Deps{
-		UserHandler:  userHandler,
-		MovieHandler: movieHandler,
-		ListHandler:  listHandler,
-		JWTSecret:    cfg.JWTSecret,
+		UserHandler:   userHandler,
+		MovieHandler:  movieHandler,
+		ListHandler:   listHandler,
+		ReviewHandler: reviewHandler,
+		JWTSecret:     cfg.JWTSecret,
 	})
 
 	log.Println("Server running on port", cfg.Port)
@@ -40,4 +41,3 @@ func main() {
 		log.Fatal(err)
 	}
 }
-
