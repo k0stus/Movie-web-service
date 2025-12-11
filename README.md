@@ -1,3 +1,10 @@
+# Uruchomienie
+Będąc w korzeniu projektu, wpisać
+```bash
+$ docker compose up --build
+```
+Backend działa na porcie `8080`, frontend `5173`, redis `6379`.
+
 # Movie-web-service
 Movie streaming web application with recommendations, project for Software Development course at PWr.
 
