@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"movie-backend/internal/cache"
 	"movie-backend/internal/config"
 	"movie-backend/internal/db"
 	"movie-backend/internal/list"
@@ -23,8 +24,14 @@ func main() {
 
 	tmdbClient := tmdb.NewClient(cfg.TMDBApiKey)
 
+	// --- Redis ---
+	redisCache, err := cache.NewRedisCache(cfg.RedisURI, cfg.RedisTTL)
+	if err != nil {
+		log.Fatal("cannot connect to Redis: ", err)
+	}
+
 	userHandler := user.NewHandler(database, cfg.JWTSecret)
-	movieHandler := movie.NewHandler(tmdbClient)
+	movieHandler := movie.NewHandler(tmdbClient, redisCache)
 	listHandler := list.NewHandler(database)
 	reviewHandler := review.NewHandler(database)
 

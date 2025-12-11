@@ -1,9 +1,11 @@
 package movie
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
-	
+
+	"movie-backend/internal/cache"
 	"movie-backend/internal/models"
 	"movie-backend/internal/tmdb"
 
@@ -11,61 +13,81 @@ import (
 )
 
 type Handler struct {
-	tmdb *tmdb.Client
+	tmdb  *tmdb.Client
+	cache *cache.RedisCache
 }
 
-func NewHandler(tmdbClient *tmdb.Client) *Handler {
-	return &Handler{tmdb: tmdbClient}
+func NewHandler(tmdbClient *tmdb.Client, cache *cache.RedisCache) *Handler {
+	return &Handler{
+		tmdb:  tmdbClient,
+		cache: cache,
+	}
 }
 
 type MovieWithTrailer struct {
-    Data       models.MovieFromTMDB `json:"data"`
-    YoutubeKey string               `json:"youtubeKey"`
+	Data       models.MovieFromTMDB `json:"data"`
+	YoutubeKey string               `json:"youtubeKey"`
 }
 
 func (h *Handler) GetPopular(c *gin.Context) {
-    limit := 10
-    if lStr := c.Query("limit"); lStr != "" {
-        if l, err := strconv.Atoi(lStr); err == nil && l > 0 && l <= 100 {
-            limit = l
-        }
-    }
+	limit := 10
+	if lStr := c.Query("limit"); lStr != "" {
+		if l, err := strconv.Atoi(lStr); err == nil && l > 0 && l <= 100 {
+			limit = l
+		}
+	}
 
-    
-    pagesToFetch := 2 
+	cacheKey := "movies:popular:" + strconv.Itoa(limit)
 
-    var result []gin.H
+	// --- TRY CACHE ---
+	if h.cache.Exists(cacheKey) {
+		cached, err := h.cache.Get(cacheKey)
+		if err == nil {
+			var cachedResult []gin.H
+			if json.Unmarshal([]byte(cached), &cachedResult) == nil {
+				c.JSON(http.StatusOK, cachedResult)
+				return
+			}
+		}
+	}
 
-    for page := 1; page <= pagesToFetch && len(result) < limit; page++ {
-        movies, err := h.tmdb.GetPopularMovies(page)
-        if err != nil {
-            c.JSON(http.StatusInternalServerError, gin.H{"error": "TMDB error"})
-            return
-        }
+	pagesToFetch := 2
 
-        for _, m := range movies {
-            if len(result) >= limit {
-                break
-            }
+	var result []gin.H
 
-            trailerKey, _ := h.tmdb.GetMovieTrailerKey(m.ID)
-            if trailerKey == "" {
-                continue // pomijamy filmy bez trailera
-            }
+	for page := 1; page <= pagesToFetch && len(result) < limit; page++ {
+		movies, err := h.tmdb.GetPopularMovies(page)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "TMDB error"})
+			return
+		}
 
-            result = append(result, gin.H{
-                "id":         m.ID,
-                "title":      m.Title,
-                "posterPath": m.PosterPath,
-                "voteAvg":    m.VoteAvg,
-                "youtubeKey": trailerKey,
-            })
-        }
-    }
+		for _, m := range movies {
+			if len(result) >= limit {
+				break
+			}
 
-    c.JSON(http.StatusOK, result)
+			trailerKey, _ := h.tmdb.GetMovieTrailerKey(m.ID)
+			if trailerKey == "" {
+				continue // pomijamy filmy bez trailera
+			}
+
+			result = append(result, gin.H{
+				"id":         m.ID,
+				"title":      m.Title,
+				"posterPath": m.PosterPath,
+				"voteAvg":    m.VoteAvg,
+				"youtubeKey": trailerKey,
+			})
+		}
+	}
+
+	// --- SAVE TO CACHE ---
+	jsonData, _ := json.Marshal(result)
+	_ = h.cache.Set(cacheKey, string(jsonData))
+
+	c.JSON(http.StatusOK, result)
 }
-
 
 func (h *Handler) GetDetails(c *gin.Context) {
 	idStr := c.Param("id")
@@ -73,6 +95,20 @@ func (h *Handler) GetDetails(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid movie id"})
 		return
+	}
+
+	cacheKey := "movie:details:" + idStr
+
+	// --- TRY CACHE ---
+	if h.cache.Exists(cacheKey) {
+		cached, err := h.cache.Get(cacheKey)
+		if err == nil {
+			var cachedResp MovieWithTrailer
+			if json.Unmarshal([]byte(cached), &cachedResp) == nil {
+				c.JSON(http.StatusOK, cachedResp)
+				return
+			}
+		}
 	}
 
 	movie, err := h.tmdb.GetMovieDetails(id)
@@ -92,6 +128,9 @@ func (h *Handler) GetDetails(c *gin.Context) {
 		YoutubeKey: trailerKey,
 	}
 
+	// --- SAVE TO CACHE ---
+	jsonData, _ := json.Marshal(resp)
+	_ = h.cache.Set(cacheKey, string(jsonData))
+
 	c.JSON(http.StatusOK, resp)
 }
-
