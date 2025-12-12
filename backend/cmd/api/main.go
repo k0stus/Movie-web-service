@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"movie-backend/internal/cache"
 	"movie-backend/internal/config"
 	"movie-backend/internal/db"
 	"movie-backend/internal/list"
@@ -10,7 +11,6 @@ import (
 	"movie-backend/internal/router"
 	"movie-backend/internal/tmdb"
 	"movie-backend/internal/user"
-
 )
 
 func main() {
@@ -24,8 +24,22 @@ func main() {
 
 	tmdbClient := tmdb.NewClient(cfg.TMDBApiKey)
 
+	// ---- Redis ----
+	var redisCache *cache.RedisCache
+	if cfg.RedisURI != "" && cfg.RedisTTL > 0 {
+		rc, err := cache.NewRedisCache(cfg.RedisURI, cfg.RedisTTL)
+		if err != nil {
+			log.Println("Redis disabled, cannot init:", err)
+		} else {
+			log.Println("Redis cache enabled")
+			redisCache = rc
+		}
+	} else {
+		log.Println("Redis not configured, cache disabled")
+	}
+
 	userHandler := user.NewHandler(database, cfg.JWTSecret)
-	movieHandler := movie.NewHandler(tmdbClient)
+	movieHandler := movie.NewHandler(database, tmdbClient, redisCache)
 	listHandler := list.NewHandler(database)
 
 	r := router.New(router.Deps{
@@ -40,4 +54,3 @@ func main() {
 		log.Fatal(err)
 	}
 }
-

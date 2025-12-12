@@ -33,29 +33,29 @@ export default function Register() {
     return "";
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    setFormError("");
+  setFormError("");
 
-    const emailErr = validateEmail(email);
-    const passErr = validatePassword(password);
-    const confirmErr = validateConfirm(password, confirmPassword);
+  const emailErr = validateEmail(email);
+  const passErr = validatePassword(password);
+  const confirmErr = validateConfirm(password, confirmPassword);
 
-    setEmailError(emailErr);
-    setPasswordError(passErr);
-    setConfirmError(confirmErr);
+  setEmailError(emailErr);
+  setPasswordError(passErr);
+  setConfirmError(confirmErr);
 
-    if (emailErr || passErr || confirmErr) return;
+  if (emailErr || passErr || confirmErr) return;
 
-    try {
-      await registerUser(email, "", password);
-      navigate("/login");
-    } catch (err) {
-      setFormError(err.message);
-      console.error("Register error:", err);
-    }
-  };
+  try {
+    await registerUser(email, password);
+    navigate("/login");
+  } catch (err) {
+    setFormError(err.message);
+  }
+};
+
 
   return (
     <div className="register-page">

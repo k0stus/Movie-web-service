@@ -1,65 +1,161 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+// src/components/Navbar.jsx
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/navbar.css";
-import { useAuth } from "../AuthContext";
+
+// watchlisty (TMDB)
+const WATCHLISTS = [
+  { id: "popular", label: "Popularne" },
+  { id: "action", label: "Akcja" },
+  { id: "comedy", label: "Komedia" },
+  { id: "animation", label: "Animacja" },
+];
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const token = localStorage.getItem("token");
+  const email = localStorage.getItem("email");
+
+  const [search, setSearch] = useState("");
+  const [list, setList] = useState("popular");
   const [menuOpen, setMenuOpen] = useState(false);
-  const { user, logout } = useAuth();
+
+  // sync z URL (list & search)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const q = params.get("search") || "";
+    const l = params.get("list") || "popular";
+    setSearch(q);
+    setList(l);
+  }, [location.search]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("email");
+    navigate("/");
+  };
+
+  const navigateWithParams = (newList, newSearch) => {
+    const params = new URLSearchParams();
+    params.set("list", newList || "popular");
+
+    if (newSearch && newSearch.trim() !== "") {
+      params.set("search", newSearch.trim());
+    }
+
+    navigate(`/movies?${params.toString()}`);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    navigateWithParams(list, search);
+    setMenuOpen(false);
+  };
+
+  const handleListChange = (e) => {
+    const newList = e.target.value;
+    setList(newList);
+    navigateWithParams(newList, search);
+  };
 
   return (
     <nav className="navbar">
-
-     
-      <div className="navbar-logo" onClick={() => navigate("/")}>
+      {/* LEWO – logo */}
+      <div className="navbar-left" onClick={() => navigate("/")}>
         Movie Web App
       </div>
 
-      
-      <div className="desktop-buttons">
+      {/* ŚRODEK – watchlist + wyszukiwarka */}
+      <div className="navbar-center">
+        <select
+          value={list}
+          onChange={handleListChange}
+          className="navbar-watchlist-select"
+        >
+          {WATCHLISTS.map((w) => (
+            <option key={w.id} value={w.id}>
+              {w.label}
+            </option>
+          ))}
+        </select>
 
-        {!user && (
+        <form className="navbar-search" onSubmit={handleSearchSubmit}>
+          <input
+            type="text"
+            placeholder="Szukaj filmu..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <button type="submit">Szukaj</button>
+        </form>
+      </div>
+
+      {/* PRAWO – logowanie / playlisty / wylogowanie */}
+      <div className="navbar-right desktop-only">
+        {!token ? (
           <>
             <button className="nav-btn" onClick={() => navigate("/login")}>
               Logowanie
             </button>
-
             <button className="nav-btn" onClick={() => navigate("/register")}>
               Rejestracja
             </button>
           </>
-        )}
-
-        {user && (
+        ) : (
           <>
-            <span className="nav-email">{user.email}</span>
-
+            {/* NOWY PRZYCISK PLAYLISTY */}
             <button
-              className="nav-btn logout-btn"
-              onClick={() => {
-                logout();
-                navigate("/");
-              }}
+              className="nav-btn"
+              onClick={() => navigate("/playlists")}
             >
+              Playlisty
+            </button>
+
+            <span className="navbar-email">{email}</span>
+            <button className="nav-btn" onClick={handleLogout}>
               Wyloguj
             </button>
           </>
         )}
       </div>
 
+      {/* HAMBURGER (mobile) */}
       <div
         className="hamburger-button"
-        onClick={() => setMenuOpen(!menuOpen)}
+        onClick={() => setMenuOpen((prev) => !prev)}
       >
         ☰
       </div>
 
-      {/* MOBILE MENU */}
       {menuOpen && (
         <div className="mobile-menu">
+          <div className="mobile-watchlist">
+            <select
+              value={list}
+              onChange={handleListChange}
+              className="navbar-watchlist-select"
+            >
+              {WATCHLISTS.map((w) => (
+                <option key={w.id} value={w.id}>
+                  {w.label}
+                </option>
+              ))}
+            </select>
+          </div>
 
-          {!user && (
+          <form className="mobile-search" onSubmit={handleSearchSubmit}>
+            <input
+              type="text"
+              placeholder="Szukaj filmu..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <button type="submit">Szukaj</button>
+          </form>
+
+          {!token ? (
             <>
               <button
                 className="mobile-btn"
@@ -70,7 +166,6 @@ export default function Navbar() {
               >
                 Logowanie
               </button>
-
               <button
                 className="mobile-btn"
                 onClick={() => {
@@ -81,18 +176,25 @@ export default function Navbar() {
                 Rejestracja
               </button>
             </>
-          )}
-
-          {user && (
+          ) : (
             <>
-              <span className="mobile-email">{user.email}</span>
-
+              {/* PLAYLISTY TAKŻE W MOBILE */}
               <button
-                className="mobile-btn logout-btn"
+                className="mobile-btn"
                 onClick={() => {
-                  logout();
+                  navigate("/playlists");
                   setMenuOpen(false);
-                  navigate("/");
+                }}
+              >
+                Playlisty
+              </button>
+
+              <div className="mobile-email">{email}</div>
+              <button
+                className="mobile-btn"
+                onClick={() => {
+                  handleLogout();
+                  setMenuOpen(false);
                 }}
               >
                 Wyloguj
@@ -104,4 +206,3 @@ export default function Navbar() {
     </nav>
   );
 }
-
