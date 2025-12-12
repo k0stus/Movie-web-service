@@ -1,0 +1,20 @@
+1. Przygotowanie projektu:
+W ./frontend
+
+$ npm install
+
+W root projektu
+
+$ chmod +x ./run.sh
+
+2. Uruchomienie Redis
+Z dockera:
+$ docker run -d --name redis1 -p 6379:6379 redis
+
+3. Mongo i tak działa, bo jest uruchomiony klaster
+
+4.
+
+$ ./run.sh
+
+Backend działa na porcie 8080, frontend 5173, redis 6379.
