@@ -1,0 +1,64 @@
+services:
+  # ------------------------------
+  # MongoDB
+  # ------------------------------
+  mongo:
+    image: mongo:6
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mmwwoo2526_db_user
+      MONGO_INITDB_ROOT_PASSWORD: haslo123
+    volumes:
+      - mongo_data:/data/db
+
+  # ------------------------------
+  # Redis
+  # ------------------------------
+  redis:
+    image: redis:7
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  # ------------------------------
+  # Backend (Go)
+  # ------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    restart: always
+    env_file:
+      - ./backend/.env
+    environment:
+      MONGO_URI: mongodb://mmwwoo2526_db_user:haslo123@mongo:27017/movie?authSource=admin
+      REDIS_URI: redis://redis:6379/0
+    ports:
+      - "8080:8080"
+    depends_on:
+      mongo:
+        condition: service_started
+      redis:
+        condition: service_started
+
+  # ------------------------------
+  # Frontend (Nginx)
+  # ------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: always
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:
